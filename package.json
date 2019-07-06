@@ -1,22 +1,28 @@
 {
-  "name": "decorfn-firebase",
-  "version": "0.0.1",
-  "description": "Decorators for firebase functions, the typescript way.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/decorfn/firebase.git"
-  },
-  "keywords": [
-    "firebase"
-  ],
-  "author": "Sebastian Gug",
-  "license": "SEE LICENSE IN LICENCE",
-  "bugs": {
-    "url": "https://github.com/decorfn/firebase/issues"
-  },
-  "homepage": "https://github.com/decorfn/firebase#readme"
+    "name": "@decorfn/firebase",
+    "version": "0.0.2",
+    "description": "Decorators for firebase functions, the typescript way.",
+    "main": "index.js",
+    "files": [
+        "lib"
+    ],
+    "scripts": {
+        "build": "tsc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/decorfn/firebase.git"
+    },
+    "keywords": [
+        "firebase"
+    ],
+    "author": "Sebastian Gug",
+    "license": "SEE LICENSE IN LICENCE",
+    "bugs": {
+        "url": "https://github.com/decorfn/firebase/issues"
+    },
+    "homepage": "https://github.com/decorfn/firebase#readme",
+    "directories": {
+        "lib": "lib"
+    }
 }
