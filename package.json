@@ -31,13 +31,15 @@
     "peerDependencies": {
         "firebase-functions": "^3.0.2",
         "@types/express": "^4.17.0",
-        "express": "^4.17.1"
+        "express": "^4.17.1",
+        "reflect-metadata": "^0.1.13"
     },
     "devDependencies": {
         "@types/express": "^4.17.0",
         "@types/reflect-metadata": "^0.1.0",
         "concurrently": "^4.1.1",
         "express": "^4.17.1",
+        "firebase-admin": "^8.2.0",
         "firebase-functions": "^3.0.2",
         "nodemon": "^1.19.1",
         "reflect-metadata": "^0.1.13"

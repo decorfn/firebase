@@ -1,77 +1,64 @@
 import * as functions from 'firebase-functions';
-import { RequestHandler } from '../sample-project/functions/node_modules/@types/express';
-import { Controller } from './Main';
-// import Reflect from 'reflect-metadata';
+import { Controller, Main } from './Main';
+import { NextFunction } from 'express-serve-static-core';
+import {
+    ClassCallMiddleware,
+    CallMiddleware,
+    FireFunction
+} from './decorators';
 import 'reflect-metadata';
-type Middleware = RequestHandler;
-import { Request, Response, NextFunction } from 'express';
 
-/** @middleware  Used to check if a user is a thames labs super-admin */
-export function mp01_checkSuperAdmin(
-    req: Request,
-    res: Response,
+const callMid1: CallMiddleware = (
+    data: any,
+    context: functions.https.CallableContext,
     next: NextFunction
-) {
-    let isAllowed = true;
-    if (isAllowed) {
-        next();
-    } else {
-        let err = new Error();
-        err.name = 'permissions';
-        next(err);
+) => {
+    console.log('CALL MID 1');
+    data.callMid1 = true;
+    next();
+};
+
+const callMid2: CallMiddleware = (
+    data: any,
+    context: functions.https.CallableContext,
+    next: NextFunction
+) => {
+    console.log('CALL MID 2');
+    data.callMid2 = true;
+    next();
+};
+
+const callMid3: CallMiddleware = (
+    data: any,
+    context: functions.https.CallableContext,
+    next: NextFunction
+) => {
+    console.log('CALL MID 3');
+    data.callMid3 = true;
+    next();
+};
+
+@ClassCallMiddleware([callMid1])
+export class TestController implements Controller {
+    @FireFunction({ region: 'europe-west1', type: 'onCall' })
+    @CallMiddleware([callMid2, callMid3])
+    TestMethod(data: any, context: functions.https.CallableContext) {
+        console.log(data);
+        console.log('THIS IS THE ACUTAL METHOD');
     }
 }
 
-export enum ClassKeys {
-    BasePath = 'BASE_PATH',
-    Middleware = 'MIDDLEWARE',
-    Wrapper = 'WRAPPER',
-    Children = 'CHILDREN',
-    Options = 'OPTIONS'
-}
-
-export function TestDecorator(
-    region: string,
-    type: 'onCall' | 'onRequest'
-): MethodDecorator {
-    return (target: any, key: string | symbol, descriptor: any) => {
-        Object.getPrototypeOf(target[key]).region = region;
-        Object.getPrototypeOf(target[key]).type = type;
-        Object.getPrototypeOf(target[key]).fnName = key as string;
-    };
-}
-
-interface TestIndex {
-    [key: string]: any;
-}
-
-export function ClassMiddleware(middleware: Middleware[]): ClassDecorator {
-    // tslint:disable-next-line:ban-types
-    return <TFunction extends Function>(target: TFunction) => {
-        Reflect.defineMetadata(
-            ClassKeys.Middleware,
-            middleware,
-            target.prototype
-        );
-        return target;
-    };
-}
-
-@ClassMiddleware([mp01_checkSuperAdmin])
-export class TestController {
-    @TestDecorator('europe-west1', 'onCall')
-    TestMethod() {}
-}
-
-export class TestMain {
+export class TestMain extends Main {
     theTest = new TestController();
+    constructor() {
+        super();
+        this.controllers = [this.theTest];
+    }
 
     run() {
-        let proto = Object.getPrototypeOf(this.theTest);
-        let middle = Reflect.getOwnMetadata(ClassKeys.Middleware, proto);
-        console.log(middle);
+        this.start();
     }
 }
 
-let Main = new TestMain();
-Main.run();
+let functionsApp = new TestMain();
+functionsApp.run();
