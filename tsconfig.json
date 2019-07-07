@@ -8,6 +8,7 @@
         "alwaysStrict": true,
         "strictNullChecks": true,
         "outDir": "./lib",
-        "declaration": true
+        "declaration": true,
+        "experimentalDecorators": true
     }
 }
