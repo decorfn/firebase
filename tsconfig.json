@@ -1,14 +1,15 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "sourceMap": true,
-        "strict": true,
-        "esModuleInterop": true,
-        "alwaysStrict": true,
-        "strictNullChecks": true,
-        "outDir": "./lib",
-        "declaration": true,
-        "experimentalDecorators": true
-    }
+	"compilerOptions": {
+		"target": "es6",
+		"module": "commonjs",
+		"sourceMap": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"alwaysStrict": true,
+		"strictNullChecks": true,
+		"outDir": "./lib",
+		"declaration": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
+	}
 }
