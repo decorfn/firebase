@@ -2,3 +2,4 @@ lib
 node_modules
 src/node_modules
 package-lock.json
+sample-angular/src/environments

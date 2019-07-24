@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "decorfn-firebase": {
+      "hosting": {
+        "sample-angular": [
+          "decorfn-firebase"
+        ]
+      }
+    }
+  }
+}

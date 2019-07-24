@@ -1,57 +1,91 @@
-export * from './decorators';
-export * from './Main';
 import * as functions from 'firebase-functions';
-import { ClassKeys } from './decorators';
+import { MethodOptions } from './decorators';
 
-interface FunctionsIndex {
+interface fni {
 	[key: string]: any;
 }
 
-export class Controller implements FunctionsIndex {
+export class FunctionsIndex implements fni {
 	[key: string]: any;
 }
 
-export class Main {
-	_controllers: Controller[] = [];
-	public set controllers(controllers: Controller[]) {
-		this._controllers = controllers;
-	}
-	// calling it in index.ts where it will fill the file with the functions
-	protected start() {
-		// iterating over all controllers/classes
-		for (let controller of this._controllers) {
-			// making sure we're only passing our Controller class through an iterator;
-			let classProto = Object.getPrototypeOf(controller);
-			let cMiddle = Reflect.getMetadata(ClassKeys.CallMiddleware, classProto);
-			for (let fn in controller) {
-				let functionProto = Object.getPrototypeOf(controller[fn]);
-				let fnOptions = Reflect.getMetadata(ClassKeys.Options, functionProto);
-				let fnName = Reflect.getMetadata('fnName', functionProto);
-				let fnMiddleware = Reflect.getMetadata(ClassKeys.CallMiddleware, functionProto);
+class Controller extends FunctionsIndex {}
+export type IController = Controller;
 
-				if (fnOptions.type === 'onCall') {
-					exports[controller.constructor.name + '_' + fnName] = functions
-						.region(fnOptions.region)
-						.https.onCall((data: any, context: functions.https.CallableContext) => {
-							let middleware = [...cMiddle, ...fnMiddleware];
-							let done = 0;
-							next();
-							function next(err?: functions.https.HttpsError | any) {
-								// error handling
-								if (err) {
-									if (err instanceof functions.https.HttpsError) {
-										throw err;
-									} else {
-										throw new functions.https.HttpsError('unknown', 'An unknown error has occured.');
+// export class Main {
+// 	public controllers: IController[] = [];
+// 	public reqMiddleware: any;
+// 	public callMiddleware: any;
+
+// 	public start() {
+// 		for (let controller of this.controllers) {
+// 			let prot = Object.getPrototypeOf(controller);
+// 			let methods = Object.getOwnPropertyNames(prot);
+// 			for (let fn of methods) {
+// 				if (fn === 'constructor') {
+// 					//
+// 				} else {
+// 					let options: MethodOptions = Object.getPrototypeOf(controller[fn]).options;
+// 					let cName: string = controller.constructor.name;
+// 					if (options.type === 'onCall') {
+// 						exports[
+// 							cName.charAt(0).toLowerCase() + cName.slice(1) + fn.charAt(0).toUpperCase() + fn.slice(1)
+// 						] = functions
+// 							.region(options.region)
+// 							.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+// 								try {
+// 									if (options.callMiddleware && options.callMiddleware.length > 0) {
+// 										for (let middleware of options.callMiddleware) {
+// 											await this.callMiddleware[middleware.constructor.name](data, context);
+// 										}
+// 									}
+// 									return controller[fn](data, context);
+// 								} catch (err) {
+// 									console.log(err);
+// 									throw new functions.https.HttpsError('unknown', 'An uknown error has occured');
+// 								}
+// 							});
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+
+export function start(controllers: IController[], MyCallMiddlewareClass?: any) {
+	for (let controller of controllers) {
+		let prot = Object.getPrototypeOf(controller);
+		let methods = Object.getOwnPropertyNames(prot);
+		for (let fn of methods) {
+			if (fn === 'constructor') {
+				//
+			} else {
+				let options: MethodOptions = Object.getPrototypeOf(controller[fn]).options;
+				let middleware = Object.getPrototypeOf(controller[fn]).middleware;
+				let cName: string = controller.constructor.name;
+				if (options.type === 'onCall') {
+					exports[
+						cName.charAt(0).toLowerCase() +
+							cName.slice(1) +
+							'_' +
+							fn.charAt(0).toUpperCase() +
+							fn.slice(1)
+					] = functions
+						.region(options.region)
+						.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+							try {
+								console.log(middleware);
+								if (middleware && middleware.length > 0) {
+									for (let midfn of middleware) {
+										console.log(midfn);
+										await MyCallMiddlewareClass[midfn](data, context);
 									}
 								}
-
-								if (done === middleware.length) {
-									return controller[fnName](data, context);
-								} else {
-									middleware[done](data, context);
-									done++;
-								}
+								// RUN GLOBAL STUFF FOR YOUR CALL FUNCTIONS  -- LIKE CALLING A DB FROM HERE.
+								return controller[fn](data, context);
+							} catch (err) {
+								console.log(err);
+								throw new functions.https.HttpsError('unknown', 'An uknown error has occured');
 							}
 						});
 				}
