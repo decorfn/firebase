@@ -23,6 +23,9 @@
         "url": "https://github.com/decorfn/firebase/issues"
     },
     "homepage": "https://github.com/decorfn/firebase#readme",
+    "directories": {
+        "lib": "lib"
+    },
     "module": "dist/es/index.js",
     "jsnext:main": "es/index.js",
     "peerDependencies": {
